@@ -105,7 +105,7 @@ void loop()
   {
     // read the incoming byte:
     incomingByte = Serial.read();
-    Serial.flush();
+    //Serial.flush();
     
     // print incoming byte:
     Serial.print("Arduino received: ");
