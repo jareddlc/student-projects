@@ -1,4 +1,4 @@
-/* Bincary Clock
+/* Binary Clock
  *--------------------------------------------------
  * v.3 - Added basic clock function. 11-23-2011
  * v.2 - Binary Clock connected. 10 LED's Blink. No clock function. 11-21-2011
