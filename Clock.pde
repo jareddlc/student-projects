@@ -17,9 +17,10 @@
  *ASCII Codes
  *H = 72, h = 104
  *M = 77, m = 109
+ *T = 84, t = 116
  *--------------------------------------------------*/
 
-const int low = 2, high = 11, H = 72, h = 104, M = 77, m = 109;
+const int low = 2, high = 11, H = 72, h = 104, M = 77, m = 109, T = 84, t = 116;
 int timer = 60, hour, minute, second, incomingByte = 0;
 unsigned long time;
 static unsigned long lastTick = 0;
@@ -34,7 +35,7 @@ void setup()
   }    
   Serial.println("Hello world! Arduino Loaded.");
   Serial.println("Description: set clock time with COM Port.");
-  Serial.println("Usage: 'H' = Hour, 'M' = Minute");
+  Serial.println("Usage: 'T' = display time, 'H' = Hour, 'M' = Minute");
 }
 
 void loop()
@@ -65,9 +66,7 @@ void loop()
   {
   hour = 0;
   minute = 0;
-  }
-  printTime();
-  
+  }  
   /*
   for (int ledPin = low; ledPin<=high; ledPin++)
   {
@@ -109,7 +108,7 @@ void loop()
     Serial.flush();
     
     // print incoming byte:
-    Serial.print("I received: ");
+    Serial.print("Arduino received: ");
     Serial.print(incomingByte, DEC);
     Serial.print(", ");
     Serial.print(incomingByte, BYTE);
@@ -129,8 +128,14 @@ void loop()
     incomingByte = 0;
   }
   
+  if((incomingByte == T) || (incomingByte == t))
+  {
+    printTime();
+    incomingByte = 0;
+  }
+  
   //Checking for invalid inputs
-   if ((incomingByte != H) && (incomingByte != h) && (incomingByte != M) && (incomingByte != m) && (incomingByte !=0))
+   if ((incomingByte != H) && (incomingByte != h) && (incomingByte != M) && (incomingByte != m) && (incomingByte == T) && (incomingByte == t) && (incomingByte !=0))
   {
     Serial.print("Command not recognized.\n");
     incomingByte = 0;
