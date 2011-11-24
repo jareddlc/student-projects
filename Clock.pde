@@ -1,5 +1,5 @@
-/* Clock
- * ---------
+/* Binary Clock
+ *--------------------------------------------------
  * v.3 - Added basic clock function. 11-23-2011
  * v.2 - Binary Clock connected. 10 LED's Blink. No clock function. 11-21-2011
  * v.1 - Row of 6 LED's Blink. 11-03-2011
@@ -17,7 +17,7 @@
  *ASCII Codes
  *H = 72, h = 104
  *M = 77, m = 109
- */
+ *--------------------------------------------------*/
 
 const int low = 2, high = 11, H = 72, h = 104, M = 77, m = 109;
 int timer = 60, hour, minute, second, incomingByte = 0;
