@@ -1,10 +1,11 @@
 /* Binary Clock
  *--------------------------------------------------
+ * v.6 - Added ledTime, printArray, clearArray functions. Binary conversion function now configures array correctly. 11-28-2011
  * v.5 - Added Increase Minute/Hour function, cleaned up some code. 11-28-11 
  * v.4 - Added Binary conversion function, temporary LED toggle switch via COM port. 11-26-2011
  * v.3 - Added basic clock function. 11-23-2011
- * v.2 - Binary Clock connected. 10 LED's Blink. No clock function. 11-21-2011
- * v.1 - Row of 6 LED's Blink. 11-03-2011
+ * v.2 - (Protoboard)Soldered LEDs to Protoboard. Installed 10 LEDs for minutes and 4 LEDs for hours. No clock function. 11-21-2011
+ * v.1 - (Breadboard)Cycled trough an array of 6 LEDs. 11-03-2011
  *
  * Developed By: Jared De La Cruz
  * Project Started 11-03-2011
@@ -19,11 +20,11 @@
  *L = 76, l = 108
  *
  *Array[]
- *Mins = {1,2,4,8,16,32}
- *Hours = {1,2,4,8}
+ *Mins = {32,16,8,4,2,1}
+ *Hours = {8,4,2,1}
  *--------------------------------------------------*/
-int timer = 60, incomingByte, hour, minute, second, arrayCount = 6, pinMinCount = 6, pinHourCount = 4, H = 72, h = 104, M = 77, m = 109, T = 84, t = 116, L = 76, l = 108;
-int ledMin[] = {11,10,9,8,7,6}, ledHour[] = {5,4,3,2}, array[6];
+int timer = 60, incomingByte, hour, minute, second, arrayCount = 6, pinMinCount = 6, pinHourCount = 4, H = 72, h = 104, M = 77, m = 109, T = 84, t = 116, L = 76, l = 108, C = 67, c = 99, P = 80, p = 112;
+int ledMin[] = {6,7,8,9,10,11}, ledHour[] = {2,3,4,5}, array[6], tarray[6];
 unsigned long time;
 static unsigned long lastTick = 0;
 
@@ -44,7 +45,9 @@ void setup()
   Serial.println("Hello world! Arduino Loaded.");
   Serial.println("Description: set clock time with COM Port.");
   Serial.println("Usage: 'T' = display time, 'H' = Hour, 'M' = Minute");
-  Serial.println("Temp Usage: 'L' = Turn on LED, 'l' = Turn off LED");
+  Serial.println("Usage: 'L' = Turn on LED, 'l' = Turn off LED");
+  Serial.println("Usage: 'P' = Print array, 'C' = Clear array");
+
 }
 
 void loop()
@@ -90,7 +93,7 @@ void loop()
     Serial.print(" Byte = ");
     Serial.print(incomingByte, BYTE);
     Serial.print(" Binary = ");
-    Serial.println(incomingByte,BIN);
+    Serial.println(incomingByte-48,BIN);
 
     if((incomingByte == H) || (incomingByte == h))
     {
@@ -107,6 +110,14 @@ void loop()
       printTime();
       incomingByte = 0;
     }
+    else if((incomingByte == C) || (incomingByte == c))
+    {
+      clearArray();
+    }
+    else if((incomingByte == P) || (incomingByte == p))
+    {
+      printArray();
+    }
     else if(incomingByte == L)
     {
       ledON();
@@ -118,13 +129,16 @@ void loop()
     else
     {
       Serial.println("Converting input to binary.");
-      toBinary(incomingByte);
       clearArray();
+      toBinary(incomingByte);
+      ledTime();
+      printArray();
       incomingByte = 0;
     }
   }
 }
 
+//Prints Time in H:M:S.
 void printTime()
 {
   Serial.print(hour);
@@ -135,6 +149,7 @@ void printTime()
   Serial.println("");
 }
 
+//Increases minutes.
 void selMin()
 {
   incomingByte = 0;
@@ -159,6 +174,7 @@ void selMin()
   Serial.println(incomingByte);
 }
 
+//Increases hours.
 void selHour()
 {
   incomingByte = 0;
@@ -183,6 +199,7 @@ void selHour()
   Serial.println(incomingByte);
 }
 
+//Turns on all LEDs.
 void ledON()
 {
    for(int i=0; i<pinMinCount; i++)
@@ -195,6 +212,7 @@ void ledON()
    }
 }
 
+//Turns off all LEDs.
 void ledOFF()
 {
   for(int i=0; i<pinMinCount; i++)
@@ -207,37 +225,64 @@ void ledOFF()
    }
 }
 
+//Cycles trough array and toggles LEDs.
 void ledTime()
 {
-  int temp;
   for(int i=0; i<arrayCount; i++)
   {
-    temp++;
+    if(array[i] == 1)
+    {
+      digitalWrite(ledMin[i],HIGH);
+    }
+    else
+    {
+      digitalWrite(ledMin[i],LOW);
+    }
   }
 }
 
+//Converts incomingByte into binary.
 void toBinary(int n)
 {
-  int temp, i = 0;
-  n = n-48;
+  int temp, x=0, j=0;
+  //Fixes ascii table characters.
+  n = n-48;  
   while(n>=1)
   {
     temp = n%2;
     n = n/2;
-    array[i] = temp;
-    i++;
+    array[x] = temp;
+    tarray[x] = temp;
+    x++;
   }
   
+  //Reverses order of array to binary.
+  for(int i=arrayCount-1; i>=0; i--)
+  {
+    array[i] = tarray[j];
+    j++;
+  } 
+}
+
+//Prints array of converted incomingByte. 
+void printArray()
+{
+  Serial.print("Input Array = ");
   for(int i=0; i<arrayCount; i++)
   {
     Serial.print(array[i]);
   }
+  Serial.println("");
 }
-
+//Zero-outs array.
 void clearArray()
 {
-   for(int i=0; i<arrayCount; i++)
+  Serial.print("Input Array = ");
+  for(int i=0; i<arrayCount; i++)
   {
     array[i] = 0;
-  } 
+    tarray[i] = 0;
+    Serial.print(array[i]);
+  }
+  Serial.println("");
 }
