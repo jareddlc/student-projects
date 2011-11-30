@@ -1,5 +1,6 @@
 /* Binary Clock
  *--------------------------------------------------
+ * v.7 - Added getTime function, fixed hour function. Clock auto illuminates each appropriate LED. 11-29-2011
  * v.6 - Added ledTime, printArray, clearArray functions. Binary conversion function now configures array correctly. 11-28-2011
  * v.5 - Added Increase Minute/Hour function, cleaned up some code. 11-28-11 
  * v.4 - Added Binary conversion function, temporary LED toggle switch via COM port. 11-26-2011
@@ -23,21 +24,20 @@
  *Mins = {32,16,8,4,2,1}
  *Hours = {8,4,2,1}
  *--------------------------------------------------*/
-int timer = 60, incomingByte, hour, minute, second, arrayCount = 6, pinMinCount = 6, pinHourCount = 4, H = 72, h = 104, M = 77, m = 109, T = 84, t = 116, L = 76, l = 108, C = 67, c = 99, P = 80, p = 112;
-int ledMin[] = {6,7,8,9,10,11}, ledHour[] = {2,3,4,5}, array[6], tarray[6];
-unsigned long time;
+int timer = 60, incomingByte, hour, minute, second, arrayCount = 6, H = 72, h = 104, M = 77, m = 109, T = 84, t = 116, L = 76, l = 108, C = 67, c = 99, P = 80, p = 112;
+int ledMin[] = {6,7,8,9,10,11}, ledHour[] = {0,1,2,3,4,5}, array[6], tarray[6];
 static unsigned long lastTick = 0;
 
 void setup()
 {
   Serial.begin(9600); 
   //Setting Min Array as OUTPUT
-  for(int i=0; i<=pinMinCount; i++)
+  for(int i=0; i<=arrayCount; i++)
   {
     pinMode(ledMin[i],OUTPUT);
   }
   //Setting Hour Array as OUTPUT
-  for(int i=0; i<=pinHourCount; i++)
+  for(int i=0; i<=arrayCount; i++)
   {
     pinMode(ledHour[i],OUTPUT);
   }
@@ -79,7 +79,7 @@ void loop()
   hour = 0;
   minute = 0;
   }  
-
+  getTime();
   //If serial input is greater than 0
   if(Serial.available() > 0) 
   {
@@ -129,9 +129,10 @@ void loop()
     else
     {
       Serial.println("Converting input to binary.");
-      clearArray();
-      toBinary(incomingByte);
-      ledTime();
+      //clearArray();
+      //toBinary(incomingByte);
+      //hourTime();
+      //minTime();
       printArray();
       incomingByte = 0;
     }
@@ -199,34 +200,8 @@ void selHour()
   Serial.println(incomingByte);
 }
 
-//Turns on all LEDs.
-void ledON()
-{
-   for(int i=0; i<pinMinCount; i++)
-   {
-     digitalWrite(ledMin[i],HIGH);
-   }
-   for(int i=0; i<pinHourCount; i++)
-   {
-     digitalWrite(ledHour[i],HIGH);
-   }
-}
-
-//Turns off all LEDs.
-void ledOFF()
-{
-  for(int i=0; i<pinMinCount; i++)
-   {
-     digitalWrite(ledMin[i],LOW);
-   }
-   for(int i=0; i<pinHourCount; i++)
-   {
-     digitalWrite(ledHour[i],LOW);
-   }
-}
-
 //Cycles trough array and toggles LEDs.
-void ledTime()
+void minTime()
 {
   for(int i=0; i<arrayCount; i++)
   {
@@ -241,12 +216,42 @@ void ledTime()
   }
 }
 
+void hourTime()
+{
+  for(int i=0; i<arrayCount; i++)
+  {
+    if(array[i] == 1)
+    {
+      digitalWrite(ledHour[i],HIGH);
+    }
+    else
+    {
+      digitalWrite(ledHour[i],LOW);
+    }
+  }
+}
+
+void getTime()
+{
+  clearArray();
+  toBinary(second+48);
+  minTime();
+  
+  clearArray();
+  toBinary(minute+48);
+  hourTime();
+}
+
 //Converts incomingByte into binary.
 void toBinary(int n)
 {
   int temp, x=0, j=0;
-  //Fixes ascii table characters.
-  n = n-48;  
+  //Uncomment for debugging.
+  //Serial.print("n before = ");
+  //Serial.print(n);
+  n = n-48;//Fixes ascii table characters.
+  //Serial.print("n after = ");
+  //Serial.println(n);  
   while(n>=1)
   {
     temp = n%2;
@@ -277,12 +282,39 @@ void printArray()
 //Zero-outs array.
 void clearArray()
 {
-  Serial.print("Input Array = ");
+  //Uncomment for debugging.
+  //Serial.print("Cleared Array = ");
   for(int i=0; i<arrayCount; i++)
   {
     array[i] = 0;
     tarray[i] = 0;
-    Serial.print(array[i]);
+    //Serial.print(array[i]);
   }
-  Serial.println("");
+  //Serial.println("");
+}
+
+//Turns on all LEDs.
+void ledON()
+{
+   for(int i=0; i<arrayCount; i++)
+   {
+     digitalWrite(ledMin[i],HIGH);
+   }
+   for(int i=0; i<arrayCount; i++)
+   {
+     digitalWrite(ledHour[i],HIGH);
+   }
+}
+
+//Turns off all LEDs.
+void ledOFF()
+{
+  for(int i=0; i<arrayCount; i++)
+   {
+     digitalWrite(ledMin[i],LOW);
+   }
+   for(int i=0; i<arrayCount; i++)
+   {
+     digitalWrite(ledHour[i],LOW);
+   }
 }
