@@ -1,12 +1,13 @@
 /* Binary Clock
  *--------------------------------------------------
- * v.7 - Added getTime function, fixed hour function. Clock auto illuminates each appropriate LED. 11-29-2011
- * v.6 - Added ledTime, printArray, clearArray functions. Binary conversion function now configures array correctly. 11-28-2011
- * v.5 - Added Increase Minute/Hour function, cleaned up some code. 11-28-11 
- * v.4 - Added Binary conversion function, temporary LED toggle switch via COM port. 11-26-2011
- * v.3 - Added basic clock function. 11-23-2011
- * v.2 - (Protoboard)Soldered LEDs to Protoboard. Installed 10 LEDs for minutes and 4 LEDs for hours. No clock function. 11-21-2011
- * v.1 - (Breadboard)Cycled trough an array of 6 LEDs. 11-03-2011
+ *      - Added Button,
+ * v.7  - Added getTime function, fixed hour function. Clock auto illuminates each appropriate LED. 11-29-2011
+ * v.6  - Added ledTime, printArray, clearArray functions. Binary conversion function now configures array correctly. 11-28-2011
+ * v.5  - Added Increase Minute/Hour function, cleaned up some code. 11-28-11 
+ * v.4  - Added Binary conversion function, temporary LED toggle switch via COM port. 11-26-2011
+ * v.3  - Added basic clock function. 11-23-2011
+ * v.2  - (Protoboard)Soldered LEDs to Protoboard. Installed 10 LEDs for minutes and 4 LEDs for hours. No clock function. 11-21-2011
+ * v.1  - (Breadboard)Cycled trough an array of 6 LEDs. 11-03-2011
  *
  * Developed By: Jared De La Cruz
  * Project Started 11-03-2011
@@ -19,12 +20,14 @@
  *M = 77, m = 109
  *T = 84, t = 116
  *L = 76, l = 108
+ *C = 67, c = 99
+ *P = 80, p = 112
  *
  *Array[]
  *Mins = {32,16,8,4,2,1}
  *Hours = {8,4,2,1}
  *--------------------------------------------------*/
-int timer = 60, incomingByte, hour, minute, second, arrayCount = 6, H = 72, h = 104, M = 77, m = 109, T = 84, t = 116, L = 76, l = 108, C = 67, c = 99, P = 80, p = 112;
+int tick = 10, incomingByte, hour, minute, second, arrayCount = 6, buttonPin = 12, ledPin = 13, buttonState;
 int ledMin[] = {6,7,8,9,10,11}, ledHour[] = {0,1,2,3,4,5}, array[6], tarray[6];
 static unsigned long lastTick = 0;
 
@@ -41,6 +44,9 @@ void setup()
   {
     pinMode(ledHour[i],OUTPUT);
   }
+  //Setting Button as INPUT
+  pinMode(buttonPin, INPUT);
+  pinMode(ledPin, OUTPUT); 
   
   Serial.println("Hello world! Arduino Loaded.");
   Serial.println("Description: set clock time with COM Port.");
@@ -53,7 +59,7 @@ void setup()
 void loop()
 {
   //Counts each second since start of arduino.
-  if(millis() - lastTick >= 1000)
+  if(millis() - lastTick >= tick)
   {
     lastTick = millis();
     second++;
@@ -78,8 +84,21 @@ void loop()
   {
   hour = 0;
   minute = 0;
-  }  
+  }
+  //Comment-Out GetTime to use some of the COM Port functions. 
   getTime();
+  
+  //Reading Button
+  buttonState = digitalRead(buttonPin);
+  if (buttonState == HIGH) {    
+    // turn LED on:    
+    digitalWrite(ledPin, HIGH);  
+  }
+  else {
+    // turn LED off:
+    digitalWrite(ledPin, LOW);
+  }
+  
   //If serial input is greater than 0
   if(Serial.available() > 0) 
   {
@@ -95,46 +114,45 @@ void loop()
     Serial.print(" Binary = ");
     Serial.println(incomingByte-48,BIN);
 
-    if((incomingByte == H) || (incomingByte == h))
+    switch(incomingByte)
     {
-      selHour();
-      incomingByte = 0;
-    }
-    else if((incomingByte == M) || (incomingByte == m))
-    {
-      selMin();
-      incomingByte = 0;
-    }
-    else if((incomingByte == T) || (incomingByte == t))
-    {
-      printTime();
-      incomingByte = 0;
-    }
-    else if((incomingByte == C) || (incomingByte == c))
-    {
-      clearArray();
-    }
-    else if((incomingByte == P) || (incomingByte == p))
-    {
-      printArray();
-    }
-    else if(incomingByte == L)
-    {
-      ledON();
-    }
-    else if(incomingByte == l)
-    {
-      ledOFF();
-    }
-    else
-    {
-      Serial.println("Converting input to binary.");
-      //clearArray();
-      //toBinary(incomingByte);
-      //hourTime();
-      //minTime();
-      printArray();
-      incomingByte = 0;
+      case 'H':
+      case 'h':
+        setHour();
+        incomingByte = 0;
+        break;
+      case 'M':
+      case 'm':
+        setMin();
+        incomingByte = 0;
+        break;
+      case 'T':
+      case 't':
+        printTime();
+        incomingByte = 0;
+        break;
+      case 'C':
+      case 'c':
+        clearArray();
+        break;
+      case 'P':
+      case 'p':
+        printArray();
+        break;
+      case 'L':
+        ledON();
+        break;
+      case 'l':
+        ledOFF();
+        break;
+      default:
+         Serial.println("Converting input to binary.");
+        //clearArray();
+        //toBinary(incomingByte);
+        //hourTime();
+        //minTime();
+        printArray();
+        incomingByte = 0; 
     }
   }
 }
@@ -151,7 +169,7 @@ void printTime()
 }
 
 //Increases minutes.
-void selMin()
+void setMin()
 {
   incomingByte = 0;
   Serial.println("Minutes selected.");
@@ -176,7 +194,7 @@ void selMin()
 }
 
 //Increases hours.
-void selHour()
+void setHour()
 {
   incomingByte = 0;
   Serial.println("Hours selected.");
@@ -234,11 +252,11 @@ void hourTime()
 void getTime()
 {
   clearArray();
-  toBinary(second+48);
+  toBinary(minute+48);
   minTime();
   
   clearArray();
-  toBinary(minute+48);
+  toBinary(hour+48);
   hourTime();
 }
 
