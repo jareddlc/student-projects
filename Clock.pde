@@ -1,6 +1,6 @@
 /* Binary Clock
  *--------------------------------------------------
- *      - Added Button,
+ *      - Added Buttons,
  * v.7  - Added getTime function, fixed hour function. Clock auto illuminates each appropriate LED. 11-29-2011
  * v.6  - Added ledTime, printArray, clearArray functions. Binary conversion function now configures array correctly. 11-28-2011
  * v.5  - Added Increase Minute/Hour function, cleaned up some code. 11-28-11 
@@ -27,8 +27,8 @@
  *Mins = {32,16,8,4,2,1}
  *Hours = {8,4,2,1}
  *--------------------------------------------------*/
-int tick = 10, incomingByte, hour, minute, second, arrayCount = 6, buttonPin = 12, ledPin = 13, buttonState;
-int ledMin[] = {6,7,8,9,10,11}, ledHour[] = {0,1,2,3,4,5}, array[6], tarray[6];
+int tick = 1000, incomingByte, hour, minute, second, arrayCount = 6, buttonCount = 2, buttonState0, buttonState1;
+int ledMin[] = {6,7,8,9,10,11}, ledHour[] = {0,1,2,3,4,5}, buttonPin[] = {12,13}, array[6], tarray[6];
 static unsigned long lastTick = 0;
 
 void setup()
@@ -45,9 +45,10 @@ void setup()
     pinMode(ledHour[i],OUTPUT);
   }
   //Setting Button as INPUT
-  pinMode(buttonPin, INPUT);
-  pinMode(ledPin, OUTPUT); 
-  
+  for(int i=0;i<buttonCount;i++)
+  {
+    pinMode(buttonPin[i], INPUT);
+  }
   Serial.println("Hello world! Arduino Loaded.");
   Serial.println("Description: set clock time with COM Port.");
   Serial.println("Usage: 'T' = display time, 'H' = Hour, 'M' = Minute");
@@ -73,14 +74,14 @@ void loop()
   }
   
   //If 60 minute, increase hour and resets minute.
-  if (minute >= 60) 
+  if(minute >= 60) 
   {
   hour++;
   minute = 0;
   }
   
   //If 24 hour, reset hour and resets minute.
-  if (hour >= 24) 
+  if(hour >= 24) 
   {
   hour = 0;
   minute = 0;
@@ -89,15 +90,21 @@ void loop()
   getTime();
   
   //Reading Button
-  buttonState = digitalRead(buttonPin);
-  if (buttonState == HIGH) {    
+  buttonState0 = digitalRead(buttonPin[0]);
+  buttonState1 = digitalRead(buttonPin[1]);
+  if(buttonState0 == HIGH) 
+  {    
     // turn LED on:    
-    digitalWrite(ledPin, HIGH);  
+    Serial.println("Button 0 pressed!");
+    minute++;
   }
-  else {
-    // turn LED off:
-    digitalWrite(ledPin, LOW);
+  
+  if(buttonState1 == HIGH)
+  {
+    Serial.println("Button 1 pressed!");
+    hour++;
   }
+
   
   //If serial input is greater than 0
   if(Serial.available() > 0) 
