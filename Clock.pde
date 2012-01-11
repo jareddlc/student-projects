@@ -1,6 +1,6 @@
 /* Binary Clock
  *--------------------------------------------------
- *      - Added Buttons,
+ * v.8  - Added Buttons, need to fix debounce function. 1-10-2011
  * v.7  - Added getTime function, fixed hour function. Clock auto illuminates each appropriate LED. 11-29-2011
  * v.6  - Added ledTime, printArray, clearArray functions. Binary conversion function now configures array correctly. 11-28-2011
  * v.5  - Added Increase Minute/Hour function, cleaned up some code. 11-28-11 
@@ -26,10 +26,13 @@
  *Array[]
  *Mins = {32,16,8,4,2,1}
  *Hours = {8,4,2,1}
+ *
+ *Button0 = mins
+ *Button1 = hours
  *--------------------------------------------------*/
-int tick = 1000, incomingByte, hour, minute, second, arrayCount = 6, buttonCount = 2, buttonState0, buttonState1;
+int tick = 1000, incomingByte, hour, minute, second, arrayCount = 6, buttonCount = 2, button0, button1, button0State, button1State, button0LastState = LOW, button1LastState = LOW;
 int ledMin[] = {6,7,8,9,10,11}, ledHour[] = {0,1,2,3,4,5}, buttonPin[] = {12,13}, array[6], tarray[6];
-static unsigned long lastTick = 0;
+static unsigned long lastTick = 0, lastDebounceTime = 0, debounceDelay = 100;
 
 void setup()
 {
@@ -90,16 +93,28 @@ void loop()
   getTime();
   
   //Reading Button
-  buttonState0 = digitalRead(buttonPin[0]);
-  buttonState1 = digitalRead(buttonPin[1]);
-  if(buttonState0 == HIGH) 
-  {    
-    // turn LED on:    
+  button0 = digitalRead(buttonPin[0]);
+  button1 = digitalRead(buttonPin[1]);
+  
+  //If button does not equal to last state, reset decounce timing
+  if(button0 != button0LastState)
+  {
+    lastDebounceTime = millis();
+  }
+  
+  //If time passed is greater than debounce
+  if((millis() - lastDebounceTime) > debounceDelay) 
+  {
+    button0State = button0;
+  }
+  
+  if(button0 == HIGH) 
+  {
     Serial.println("Button 0 pressed!");
     minute++;
   }
-  
-  if(buttonState1 == HIGH)
+
+  if(button1 == HIGH)
   {
     Serial.println("Button 1 pressed!");
     hour++;
@@ -225,7 +240,7 @@ void setHour()
   Serial.println(incomingByte);
 }
 
-//Cycles trough array and toggles LEDs.
+//Cycles trough array and toggles minutes LEDs.
 void minTime()
 {
   for(int i=0; i<arrayCount; i++)
@@ -241,6 +256,7 @@ void minTime()
   }
 }
 
+//Cycles trough array and toggles hours LEDs.
 void hourTime()
 {
   for(int i=0; i<arrayCount; i++)
