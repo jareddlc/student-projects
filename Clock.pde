@@ -1,6 +1,6 @@
 /* Binary Clock
  *--------------------------------------------------
- * v.8  - Added Buttons, need to fix debounce function. 1-10-2011
+ * v.8  - Added Buttons, debounce delay. 1-11-2011
  * v.7  - Added getTime function, fixed hour function. Clock auto illuminates each appropriate LED. 11-29-2011
  * v.6  - Added ledTime, printArray, clearArray functions. Binary conversion function now configures array correctly. 11-28-2011
  * v.5  - Added Increase Minute/Hour function, cleaned up some code. 11-28-11 
@@ -30,9 +30,9 @@
  *Button0 = mins
  *Button1 = hours
  *--------------------------------------------------*/
-int tick = 1000, incomingByte, hour, minute, second, arrayCount = 6, buttonCount = 2, button0, button1, button0State, button1State, button0LastState = LOW, button1LastState = LOW;
+int incomingByte, hour, minute, second, arrayCount = 6, buttonCount = 2, button0, button1, button0State, button1State, button0LastState = LOW, button1LastState = LOW;
 int ledMin[] = {6,7,8,9,10,11}, ledHour[] = {0,1,2,3,4,5}, buttonPin[] = {12,13}, array[6], tarray[6];
-static unsigned long lastTick = 0, lastDebounceTime = 0, debounceDelay = 100;
+static unsigned long lastTick = 0, tick = 1000, lastDebounceTime = 0, debounceDelay = 100;
 
 void setup()
 {
@@ -96,26 +96,16 @@ void loop()
   button0 = digitalRead(buttonPin[0]);
   button1 = digitalRead(buttonPin[1]);
   
-  //If button does not equal to last state, reset decounce timing
-  if(button0 != button0LastState)
-  {
-    lastDebounceTime = millis();
-  }
-  
-  //If time passed is greater than debounce
-  if((millis() - lastDebounceTime) > debounceDelay) 
-  {
-    button0State = button0;
-  }
-  
   if(button0 == HIGH) 
   {
+    delay(100);
     Serial.println("Button 0 pressed!");
     minute++;
   }
 
   if(button1 == HIGH)
   {
+    delay(100);
     Serial.println("Button 1 pressed!");
     hour++;
   }
@@ -359,3 +349,4 @@ void ledOFF()
      digitalWrite(ledHour[i],LOW);
    }
 }
+
