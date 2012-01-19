@@ -1,6 +1,7 @@
 /* Binary Clock
  *--------------------------------------------------
- * v.8  - Added Buttons, debounce delay. 1-11-2011
+ * v.9  - Changed the way getTime() function is called. Trying to elimate bug. 1-18-2012
+ * v.8  - Added Buttons, debounce delay. 1-11-2012
  * v.7  - Added getTime function, fixed hour function. Clock auto illuminates each appropriate LED. 11-29-2011
  * v.6  - Added ledTime, printArray, clearArray functions. Binary conversion function now configures array correctly. 11-28-2011
  * v.5  - Added Increase Minute/Hour function, cleaned up some code. 11-28-11 
@@ -70,10 +71,11 @@ void loop()
   }
 
   //If 60 secs, increase minute and resets second.
-  if(second >= 60)
+  if(second >= 59)
   {
     minute++;
     second = 0;
+    getTime();
   }
   
   //If 60 minute, increase hour and resets minute.
@@ -90,7 +92,7 @@ void loop()
   minute = 0;
   }
   //Comment-Out GetTime to use some of the COM Port functions. 
-  getTime();
+  //getTime();
   
   //Reading Button
   button0 = digitalRead(buttonPin[0]);
@@ -101,6 +103,7 @@ void loop()
     delay(100);
     Serial.println("Button 0 pressed!");
     minute++;
+    getTime();
   }
 
   if(button1 == HIGH)
@@ -108,6 +111,7 @@ void loop()
     delay(100);
     Serial.println("Button 1 pressed!");
     hour++;
+    getTime();
   }
 
   
