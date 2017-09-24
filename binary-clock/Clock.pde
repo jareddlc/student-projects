@@ -1,19 +1,19 @@
 /* Binary Clock
  *--------------------------------------------------
- * v.9  - Changed the way getTime() function is called. Trying to elimate bug. 1-18-2012
+ * v.9  - Changed the way getTime() function is called. Trying to eliminate bug. 1-18-2012
  * v.8  - Added Buttons, debounce delay. 1-11-2012
  * v.7  - Added getTime function, fixed hour function. Clock auto illuminates each appropriate LED. 11-29-2011
  * v.6  - Added ledTime, printArray, clearArray functions. Binary conversion function now configures array correctly. 11-28-2011
- * v.5  - Added Increase Minute/Hour function, cleaned up some code. 11-28-11 
+ * v.5  - Added Increase Minute/Hour function, cleaned up some code. 11-28-11
  * v.4  - Added Binary conversion function, temporary LED toggle switch via COM port. 11-26-2011
  * v.3  - Added basic clock function. 11-23-2011
- * v.2  - (Protoboard)Soldered LEDs to Protoboard. Installed 10 LEDs for minutes and 4 LEDs for hours. No clock function. 11-21-2011
- * v.1  - (Breadboard)Cycled trough an array of 6 LEDs. 11-03-2011
+ * v.2  - (Protoboard) Soldered LEDs to Protoboard. Installed 10 LEDs for minutes and 4 LEDs for hours. No clock function. 11-21-2011
+ * v.1  - (Breadboard) Cycled trough an array of 6 LEDs. 11-03-2011
  *
  * Developed By: Jared De La Cruz
  * Project Started 11-03-2011
  *
- *LED Count = 6 for Minutes 
+ *LED Count = 6 for Minutes
  *LED Count = 4 for Hours
  *
  *ASCII Codes
@@ -37,7 +37,7 @@ static unsigned long lastTick = 0, tick = 1000, lastDebounceTime = 0, debounceDe
 
 void setup()
 {
-  Serial.begin(9600); 
+  Serial.begin(9600);
   //Setting Min Array as OUTPUT
   for(int i=0; i<=arrayCount; i++)
   {
@@ -77,28 +77,28 @@ void loop()
     second = 0;
     getTime();
   }
-  
+
   //If 60 minute, increase hour and resets minute.
-  if(minute >= 60) 
+  if(minute >= 60)
   {
   hour++;
   minute = 0;
   }
-  
+
   //If 24 hour, reset hour and resets minute.
-  if(hour >= 24) 
+  if(hour >= 24)
   {
   hour = 0;
   minute = 0;
   }
-  //Comment-Out GetTime to use some of the COM Port functions. 
+  //Comment-Out GetTime to use some of the COM Port functions.
   //getTime();
-  
+
   //Reading Button
   button0 = digitalRead(buttonPin[0]);
   button1 = digitalRead(buttonPin[1]);
-  
-  if(button0 == HIGH) 
+
+  if(button0 == HIGH)
   {
     delay(100);
     Serial.println("Button 0 pressed!");
@@ -114,13 +114,13 @@ void loop()
     getTime();
   }
 
-  
+
   //If serial input is greater than 0
-  if(Serial.available() > 0) 
+  if(Serial.available() > 0)
   {
     // read the incoming byte:
     incomingByte = Serial.read();
-    
+
     // print incoming byte:
     Serial.print("Arduino received: ");
     Serial.print(" Decimnal = ");
@@ -168,7 +168,7 @@ void loop()
         //hourTime();
         //minTime();
         printArray();
-        incomingByte = 0; 
+        incomingByte = 0;
     }
   }
 }
@@ -192,7 +192,7 @@ void setMin()
   Serial.println("Increase minutes by: ");
   while(incomingByte == 0)
   {
-    if(Serial.available() > 0) 
+    if(Serial.available() > 0)
     {
       // read the incoming byte:
       incomingByte = Serial.read()- '0';
@@ -217,7 +217,7 @@ void setHour()
   Serial.println("Increase hours by: ");
   while(incomingByte == 0)
   {
-    if(Serial.available() > 0) 
+    if(Serial.available() > 0)
     {
       // read the incoming byte:
       incomingByte = Serial.read()- '0';
@@ -271,7 +271,7 @@ void getTime()
   clearArray();
   toBinary(minute+48);
   minTime();
-  
+
   clearArray();
   toBinary(hour+48);
   hourTime();
@@ -286,7 +286,7 @@ void toBinary(int n)
   //Serial.print(n);
   n = n-48;//Fixes ascii table characters.
   //Serial.print("n after = ");
-  //Serial.println(n);  
+  //Serial.println(n);
   while(n>=1)
   {
     temp = n%2;
@@ -295,16 +295,16 @@ void toBinary(int n)
     tarray[x] = temp;
     x++;
   }
-  
+
   //Reverses order of array to binary.
   for(int i=arrayCount-1; i>=0; i--)
   {
     array[i] = tarray[j];
     j++;
-  } 
+  }
 }
 
-//Prints array of converted incomingByte. 
+//Prints array of converted incomingByte.
 void printArray()
 {
   Serial.print("Input Array = ");
@@ -353,4 +353,3 @@ void ledOFF()
      digitalWrite(ledHour[i],LOW);
    }
 }
-
