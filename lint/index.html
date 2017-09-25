@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Meta -->
+    <meta charset="utf-8">
+    <title>Dynamic Tables</title>
+    <!-- CSS -->
+    <link type="text/css" href="css/jquery-ui-1.9.2.custom.css" rel="stylesheet" />
+    <link type="text/css" href="css/jquery.dataTables.css" rel="stylesheet" />
+    <link type="text/css" href="css/demo_table_jui.css" rel="stylesheet" />
+    <link type="text/css" href="css/ColReorder.css" rel="stylesheet" />
+
+    <style type="text/css">
+      body{font: 65% "Trebuchet MS", sans-serif;}
+      .dataTables_wrapper {min-height: 550px;}
+    </style>
+
+    <!-- JS -->
+    <script type="text/javascript" src="js/jquery-1.8.3.js"></script>
+    <script type="text/javascript" src="js/jquery-ui-1.9.2.custom.min.js"></script>
+    <script type="text/javascript" src="js/jquery.jeditable.js"></script>
+    <script type="text/javascript" src="js/jquery.dataTables.js"></script>
+    <script type="text/javascript" src="js/ColReorder.js"></script>
+  </head>
+
+<body>
+<script>
+  $(document).ready(function(){
+    var oTable;
+    var cache_getColumnNames;
+
+    //Table Initialization
+    function buildTable()
+    {
+      oTable = $('#example').dataTable({
+        "bJQueryUI": true,
+        //"bStateSave": true,
+        "iDisplayLength": 50,
+        //"bProcessing": true,
+        "bServerSide": true,
+        "bRetrieve": true,
+        "sAjaxSource": "http://localhost:8888/server",
+        "sPaginationType": "full_numbers",
+        "sDom": 'R<"H"lfr>t<"F"ip<',
+        "bScrollCollapse": false,
+        "bAutoWidth": false,
+        "aoColumnDefs": [{"bVisible": false, "aTargets": [0]}],
+        "fnDrawCallback": function(oSettings) {
+                            //Checks for Rows, if empty, disables add row.
+                            //Empty row set oTable.fnSettings().fnRecordsTotal()
+                            if(oTable.fnSettings().aoColumns.length == 1)
+                            {
+                              $("#btn-row-add").button({disabled: true});
+                            }
+                            else
+                            {
+                                $("#btn-row-add").button({disabled: false});
+                            }
+                          },
+      });
+    }
+
+    //Builds Table Column Header/Footer
+    function buildColumns()
+    {
+      var output_start = "<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" class=\"display\" id=\"example\">";
+      var output_body = "<tbody></tbody>";
+      var output_end = "</table>";
+      var thead_tr_start = "<thead><tr>";
+      var thead_tr_end = "</tr></thead>";
+      var tfoot_tr_start = "<tfoot><tr>";
+      var tfoot_tr_end = "</tr></tfoot>";
+      var th_start = "<th>";
+      var th_end = "</th>";
+
+      var output_head = thead_tr_start;
+      var output_foot = tfoot_tr_start ;
+
+      $.getJSON('http://localhost:8888/getColumnNames', function(data){
+        cache_getColumnNames = data;
+        buildRow();
+        //console.log(data.length);
+        //For Each Column, Create Column Header/Footer
+        for(var i=0; i<data.length; i++)
+        {
+          //console.log(data[i]['Field']);
+          output_head += th_start;
+          output_head += ucwords(data[i]['Field']);
+          output_head += th_end;
+
+          output_foot += th_start;
+          output_foot += ucwords(data[i]['Field']);
+          output_foot += th_end;
+        }
+        output_head += thead_tr_end;
+        output_foot += tfoot_tr_end;
+
+        //Create HTML Table With Footer/Header and Empty Data
+        $("#table").html(output_start+output_head+output_body+output_foot+output_end);
+        buildTable();
+
+        //Adds Buttons to the Datatables Top-Bar
+        $("#example_length").append('  <button id="btn-row-add">Add Row</button> <button id="btn-col-add">Add Column</button> <button id="btn-row-edit">Edit Row</button>');
+
+        //Add Row Button
+        $("#btn-row-add").button({
+          icons: {
+            primary: "ui-icon-circle-plus"
+            },
+        }).click(function() {
+        $("#dialog-row-add").dialog({
+          modal: true,
+          buttons: {
+            "Submit": function() {
+              var payload = $('#buildRow').serializeObject();
+              $.post("http://localhost:8888/postRow", payload, function(data) {
+                //After Row is Added, Redraw Table
+                oTable.fnDraw();
+              },"json");
+              $(this).dialog("close");
+              },
+            Cancel: function() {
+              $(this).dialog("close");
+              }
+            }
+          });
+        });
+
+        //Add Column Button
+        $("#btn-col-add").button({
+          icons: {
+            primary: "ui-icon-circle-plus"
+            },
+          }).click(function() {
+            $("#dialog-col-add").dialog({
+              modal: true,
+              buttons: {
+                "Submit": function() {
+                  $("#form-col-add-sel").find('option').attr('selected',true);
+                  var payload = $('#buildColumn').serializeObject();
+                  //payload['form-col-add-name'] = payload['form-col-add-name'].replace(/\s+/g, '_');
+                  $.post("http://localhost:8888/postCol", payload,  function(data) {
+                    //After Column is Added, Build Table Header/Footer and Row Tools then Redraw Table
+                    buildColumns();
+                    //buildRow();
+                    //oTable.fnDraw();
+                  },"json");
+                  //Resets Add Column
+                  resetFields();
+                  $(this).dialog("close");
+                },
+                Cancel: function() {
+                  //Resets Add Column
+                  resetFields();
+                  $(this).dialog("close");
+                }
+              }
+            });
+        });
+
+        //Edit Row Button
+        $("#btn-row-edit").button({
+          disabled: true,
+          icons: {
+            primary: "ui-icon-info"
+            },
+        }).click(function() {
+          //Sets Selected Row
+          var SelectedRow = fnGetSelected(oTable);
+          //console.log(SelectedRow);
+
+          if(SelectedRow.length != 0 ) {
+            var col_name = [];
+            var row_sel = oTable.fnGetData(SelectedRow[0]);
+            var oSettings = oTable.fnSettings();
+            //console.log(SelectedRow[0]);
+            //console.log(row_sel);
+            //console.log(row_sel.length);
+
+            //Grabs Column Names
+            for(var i=0; i<row_sel.length; i++)
+            {
+              var col_id = oSettings.aoColumns[i].sTitle;
+              col_name.push(col_id);
+            }
+           // console.log(col_name);
+            //Populates editRow with Selected Row Contents
+            for(var i=0; i<col_name.length; i++)
+            {
+              $("#editRow input[name="+col_name[i].toLowerCase()+"]").val(row_sel[i]);
+            }
+
+            $("#dialog-row-edit").dialog({
+              modal: true,
+              buttons: {
+                "Submit": function() {
+                  var payload = $("#editRow").serializeObject();
+                  $.post("http://localhost:8888/putRow", payload,  function(data) {
+                    buildColumns();
+                    buildRow();
+                    oTable.fnDraw();
+                  },"json");
+
+                  //Clears Edit Row.
+                  for(var i=0; i<col_name.length; i++)
+                  {
+                    $("#editRow input[name="+col_name[i].toLowerCase()+"]").val("");
+                  }
+                  $(this).dialog("close");
+                },
+                Cancel: function() {
+                  //Clears Edit Row.
+                  for(var i=0; i<col_name.length; i++)
+                  {
+                    $("#editRow input[name="+col_name[i].toLowerCase()+"]").val("");
+                  }
+                  $(this).dialog("close");
+                }
+              }
+            });
+          }
+        });
+
+      });
+    }
+
+    //Builds Row Tools
+    function buildRow()
+    {
+      var data = cache_getColumnNames;
+      var output_add_start = " <form id=\"buildRow\"><table border=\"0\" class=\"display\" id=\"tb-buildRow\">";
+      var output_edit_start = " <form id=\"editRow\"><table border=\"0\" class=\"display\" id=\"tb-editRow\">";
+      var output_body = "";
+      var output_end = " </table></form>";
+      var tr_start = "<tr>";
+      var tr_end = "</tr>";
+      var td_start = "<td>";
+      var td_end = "</td>";
+      var input_start = "<input ";
+      var input_end = "class=\"text ui-widget-content ui-corner-all\">";
+      var input_type = "type=\"";
+      var input_name = "name=\"";
+      var input_id = "id=\"";
+      var qoute_end = "\" ";
+      var select_start = "<select class=\"text ui-widget-content ui-corner-all\"";
+      var select_close = ">";
+      var select_end = "</select>";
+      var option_start = "<option ";
+      var option_end = "</option>";
+      var value_start = "value=\"";
+      var value_end = "\">";
+
+      //$.getJSON('http://localhost:8888/getColumnNames', function(data){
+
+        var types = [];
+        //Grabs Columns Types
+        for(var i=0; i<data.length; i++)
+        {
+            var pattern = /^(.*)\((.*)\)/;
+            types[i] = pattern.exec(data[i]['Type']);
+        }
+        //Fills out Table Labels
+        for(var i=0; i<data.length; i++)
+        {
+          //Creates class for id column to later hide
+          if(data[i]['Field'] == "id")
+          {
+            output_body += "<tr class=\"tr-hide\">";
+          }
+          else
+            output_body += tr_start;
+
+          output_body += td_start;
+          output_body += ucwords(data[i]['Field']);
+          output_body += td_end;
+
+          output_body += td_start;
+
+          //Fills out Table inputs
+          for(var j=0; j<types.length; j++)
+          {
+            //console.log(data[i]['Type']);         contains full column type and arguments
+            //console.log(data[i]['Type'].indexOf(types[j][1]));  Integer
+            if(data[i]['Type'].indexOf(types[j][1]) != -1)
+            {
+              //console.log(types[j]);              contains comma delimited string of types ex "int(10),int,10"
+              //console.log(data[i]['Field']);      contains column names
+              //console.log(types[j][1]);           contains column type
+
+              if(types[j][1] == "varchar")
+              {
+                output_body += input_start;
+                output_body += input_type;
+                output_body += "text";
+                output_body += qoute_end;
+                output_body += input_name;
+                output_body += data[i]['Field'].toLowerCase();
+                output_body += qoute_end;
+                output_body += input_id;
+                output_body += data[i]['Field'];
+                output_body += qoute_end;
+                output_body += input_end ;
+              }
+              if(types[j][1] == "int")
+              {
+                output_body += input_start;
+                output_body += input_type;
+                output_body += "text";
+                output_body += qoute_end;
+                output_body += input_name;
+                output_body += data[i]['Field'].toLowerCase();
+                output_body += qoute_end;
+                output_body += input_id;
+                output_body += data[i]['Field'];
+                output_body += qoute_end;
+                output_body += input_end;
+              }
+              if(types[j][1]  == "enum")
+              {
+                //console.log(types[i][2]);
+                var patt = /([^']+)/g;
+                var enums = patt.exec(types[i][2]);
+                //console.log(enums);
+                var clean = types[i][2].replace(/\'/g, "");
+                var elements = clean.split(',');
+                //console.log(elements);
+                output_body += select_start;
+                output_body += input_name;
+                output_body += data[i]['Field'];
+                output_body += qoute_end;
+                output_body += select_close;
+
+                for(var k=0; k<elements.length; k++)
+                {
+                  output_body += option_start;
+                  output_body += value_start;
+                  output_body += elements[k];
+                  output_body += value_end;
+                  output_body += ucwords(elements[k]);
+                  output_body += option_end;
+                }
+                output_body += select_end;
+              }
+              break;
+            }
+          }
+          output_body += td_end;
+          output_body += tr_end;
+        }
+
+        $("#dialog-row-add").html(output_add_start+output_body+output_end);
+        $("#dialog-row-edit").html(output_edit_start+output_body+output_end);
+        $(".tr-hide").hide();
+      //});
+    }
+
+    //Builds Column Tools
+    function buildColumn()
+    {
+      var tr_start = "<tr>";
+      var tr_end = "</tr>";
+      var td_start = "<td>";
+      var td_end = "</td>";
+
+      var output = "";
+
+      output += "<form id=\"buildColumn\"><table border=\"0\" id=\"\">";
+      output += tr_start;
+      output += td_start;
+      output += "Column Name:";
+      output += td_end;
+      output += td_start;
+      output += "<input type=\"text\" name=\"form-col-add-name\" id=\"form-col-add-name\"class=\"text ui-widget-content ui-corner-all\">";
+      output += td_end;
+      output += tr_end;
+
+      output += tr_start;
+      output += td_start;
+      output += "Column Type:";
+      output += td_end;
+      output += td_start;
+
+      output += "<select id=\"sel-col-type\" name=\"form-col-add-type\" class=\"text ui-widget-content ui-corner-all\">";
+      output += "<option value=\"varchar\">Text</option>";
+      output += "<option value=\"int\">Number</option>";
+      output += "<option value=\"enum\">Multiple Options</option>";
+      output += "</select>";
+      output += td_end;
+      output += tr_end;
+      output += "</table>";
+      output += "<br>";
+
+      output += "<div style=\"display: none;\" id=\"col-opt\">";
+      output += "<input type=\"text\" id=\"form-col-add-opt\"  class=\"text ui-widget-content ui-corner-all\">";
+      output += "<button id=\"btn-col-add-add\" type=\"button\" class=\"text ui-widget-content ui-corner-all\">Add</button>";
+      output += "<button id=\"btn-col-add-del\" type=\"button\" class=\"text ui-widget-content ui-corner-all\">Del</button>";
+      output += "<select id=\"form-col-add-sel\" name=\"form-col-add-param\" size=\"4\" style=\"width:200px\" class=\"text ui-widget-content ui-corner-all\" multiple=\"multiple\">";
+      output += "</select>";
+      output += "<br>"
+      output += "</div>";
+
+      output += "</form>";
+
+      $("#dialog-col-add").html(output);
+    }
+
+    //Grabs Tables
+    function getTables()
+    {
+      var tr_start = "<tr>";
+      var tr_end = "</tr>";
+      var td_start = "<td>";
+      var td_end = "</td>";
+
+      $.getJSON('http://localhost:8888/getTables', function(data){
+        //console.log(data);
+        var output = "<form id=\"db-sel\"><table border=\"0\" id=\"\">";
+        output += tr_start;
+        output += td_start;
+        output += "Table:";
+        output += td_end;
+        output += td_start;
+        output += "<select name=\"db-sel\" class=\"text ui-widget-content ui-corner-all\">"
+
+        for(var i in data)
+        {
+          if(data[i] != "map") //Exclude map table
+          {
+          output += "<option value=\"";
+          output += data[i];
+          output += "\">";
+          output += ucwords(data[i]);
+          output += "</option>";
+          }
+        }
+        output += "</select>";
+        output += td_end;
+        output += tr_end;
+        output += "</table></form>";
+
+        $("#dialog-db-sel").html(String(output));
+      });
+    }
+
+    //Builds Create Tables
+    function buildCreateTable()
+    {
+      var tr_start = "<tr>";
+      var tr_end = "</tr>";
+      var td_start = "<td>";
+      var td_end = "</td>";
+      var output = "<form id=\"db-create\"><table border=\"0\" id=\"\">";
+      output += tr_start;
+      output += td_start;
+      output += "Table Name:";
+      output += td_end;
+      output += td_start;
+      output += "<input type=\"text\" id=\"form-db-create-name\" name=\"form-db-create-name\"class=\"text ui-widget-content ui-corner-all\">";
+      output += td_end;
+      output += tr_end;
+      output += "</table></form>";
+
+      $("#dialog-db-create").html(String(output));
+    }
+
+    //Initial Function Calling
+    buildColumns();
+    buildColumn();
+    //buildRow();
+    getTables();
+    buildCreateTable();
+
+    //Returns Selected Row
+    function fnGetSelected(oTableLocal)
+    {
+        return oTableLocal.$('tr.row_selected');
+    }
+
+    //Capitilizes First Char of String
+    function ucwords(str) {
+      return (str + '').replace(/^([a-z])|\s+([a-z])/g, function ($1) {
+            return $1.toUpperCase();
+      });
+    }
+
+    //Serializes Form for JSON
+    $.fn.serializeObject = function()
+    {
+      var o = {};
+      var a = this.serializeArray();
+      $.each(a, function() {
+          if (o[this.name] !== undefined) {
+              if (!o[this.name].push) {
+                  o[this.name] = [o[this.name]];
+              }
+              o[this.name].push(this.value || '');
+          } else {
+              o[this.name] = this.value || '';
+          }
+      });
+      return o;
+    };
+
+    function resetFields()
+    {
+      $("#form-col-add-name").val("");
+      $('#form-col-add-opt').val('');
+      $('#form-col-add-sel').empty();
+    }
+
+    //Clickable Rows
+    $("#example tbody tr").live("click", function() {
+        //Disable the edit button
+        if($(this).hasClass('row_selected')){
+          $(this).removeClass('row_selected');
+          $("#btn-row-edit").button({disabled: true});
+        }
+        //Enable the edit button
+        else {
+          oTable.$('tr.row_selected').removeClass('row_selected');
+          $(this).addClass('row_selected');
+          $("#btn-row-edit").button({disabled: false});
+        }
+    });
+
+    //Add Column; Show Options
+    $("#sel-col-type").change(function() {
+      var selected = this.options[this.selectedIndex].value;
+      if(selected == 'enum'){
+        $("#col-opt").show();
+      }
+      else
+        $("#col-opt").hide();
+    });
+
+    //Add Column; Add Selection button
+    $("#btn-col-add-add").button({
+      icons: {
+        primary: "ui-icon-circle-plus"
+        },
+      text: false
+      }).click(function() {
+        var value = $('#form-col-add-opt').val();
+        var str = "<option value=\"";
+        str += value;
+        str += "\">"
+        str += value;
+        str += "</option>";
+        if(value != "")
+          $('#form-col-add-sel').append(str);
+        $('#form-col-add-opt').val("");
+    });
+
+    //Add Column; Delete Selection Button
+    $("#btn-col-add-del").button({
+      icons: {
+        primary: "ui-icon-circle-minus"
+        },
+      text: false
+      }).click(function() {
+        $("#form-col-add-sel option:selected").remove();
+    });
+
+    //Select Database Button
+    $("#btn-db-sel").button({
+      icons: {
+        primary: "ui-icon-folder-open"
+        },
+      }).click(function() {
+      $("#dialog-db-sel").dialog({
+      modal: true,
+      open: getTables(),
+      buttons: {
+        "Submit": function() {
+          var payload = $('#db-sel').serializeObject();
+          $.post("http://localhost:8888/selTable", payload,function(data) {
+            buildColumns();
+            buildRow();
+          },"json");
+          $(this).dialog("close");
+          },
+        Cancel: function() {
+          $(this).dialog("close");
+          }
+        }
+      });
+    });
+
+    //Create Database Button
+    $("#btn-db-create").button({
+      icons: {
+        primary: "ui-icon-folder-collapsed"
+        },
+      }).click(function() {
+      $("#dialog-db-create").dialog({
+      modal: true,
+      buttons: {
+        "Submit": function() {
+          var payload = $('#db-create').serializeObject();
+          //payload['form-db-create-name'] = payload['form-db-create-name'].replace(/\s+/g, '_');
+          $.post("http://localhost:8888/postTable", payload,function(data) {
+            getTables();
+          },"json");
+          $("#form-db-create-name").val("");
+          $(this).dialog("close");
+          },
+        Cancel: function() {
+          $("#form-db-create-name").val("");
+          $(this).dialog("close");
+          }
+        }
+      });
+    });
+
+    //Home Button
+    $("#btn-home").button({
+      icons: {
+        primary: "ui-icon-home"
+        },
+      }).click(function() {
+        window.location = "index.html";
+    });
+  });
+</script>
+
+<!-- HTML -->
+<div class="menu-bar">
+  <center>
+    <table id="table-menu" class="ui-widget ui-widget-content ui-corner-all" width=100%>
+    <tr>
+      <td><button id="btn-home">Home</button>
+      <button id="btn-db-sel">Select DB</button>
+      <button id="btn-db-create">Create DB</button></td>
+    </tr>
+    </table>
+  </center>
+</div>
+<br>
+
+<div id="table">
+  <center>
+    <table id="table_div" class="ui-widget ui-widget-content ui-corner-all" width=100%>
+    <tr><td><center>Loading Table...</center></td></tr>
+    </table>
+  </center>
+</div>
+
+<!-- HIDDEN DIVS -->
+<div style="display: none;" id="dialog-db-sel" title="Select Database">
+  <p>Select Database<br>
+</div>
+
+<div style="display: none;" id="dialog-db-create" title="Create Database">
+  <p>Create Database<br>
+</div>
+
+<div style="display: none;" id="dialog-row-add" title="Add Row">
+  <p>Add Row<br>
+</div>
+
+<div style="display: none;" id="dialog-col-add" title="Add Column">
+  <p>Add Column<br>
+</div>
+
+<div style="display: none;" id="dialog-row-edit" title="Edit Row">
+  <p>Edit Row<br>
+</div>
+
+</body>
+</html>

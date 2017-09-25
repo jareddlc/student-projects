@@ -1,0 +1,15 @@
+{
+  "name": "lint",
+  "version": "1.0.0",
+  "description": "lint",
+  "main": "server.js",
+  "author": "Jared De La Cruz",
+  "license": "ISC",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^3.21.2",
+    "mysql": "^2.14.1"
+  }
+}

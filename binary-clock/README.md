@@ -15,7 +15,7 @@ I designed the clock, wrote the firmware, created the schematics and board layou
 * 1x Power Jack
 * 1x 5v Regulator
 
-### design
+### Design
 
 Most binary clocks available use 2 bytes for each hour, minute, and seconds and I did not like that approach, so I designed my own clock. However the clock does not have an `AM` or `PM` indicator.
 
