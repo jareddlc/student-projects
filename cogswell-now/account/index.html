@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="us">
+<head>
+  <!-- Title Stuff -->
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="favicon.ico">
+  <title>Cogswell Now - Account</title>
+  
+  <!-- CSS Includes -->
+  <link href="../css/bootstrap.css" rel="stylesheet">
+
+  <!-- JS Includes -->
+  <script src="../js/jquery-1.9.1.js"></script>
+  <script src="../js/jquery.cookie.js"></script>
+  <script src="../js/bootstrap.js"></script>
+  <script src="../js/cogswell.navbar.js"></script>
+  <script src="../js/cogswell.account.js"></script>
+
+</head>
+
+<body>
+  <!-- Navbar -->
+  <div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="brand" href="/" style="padding-top: 6px; padding-bottom: 0px;">
+          <img class="" src="../img/logo-gray.png">
+        </a>
+        <div class="nav-collapse collapse">
+          <!-- Home -->
+          <ul class="nav">
+            <li><a href="/">Home</a></li>
+            <li></li>
+          </ul>
+          <!-- Sign in/register -->
+          <form action="javascript:void(0);" class="navbar-form pull-right" id="form-signin">
+            <input class="span2" type="text" placeholder="Email" name="form-signin-email" id="input-signing-email">
+            <input class="span2" type="password" placeholder="Password" name="form-signin-pass" id="input-signin-pass">
+            <button type="submit" class="btn btn-primary" id="btn-signin">Sign in</button>
+            <a href="/register/" type="submit" class="btn" id="btn-register">Register</a>            
+          </form>
+          <!-- Settings drop down-->
+          <ul class="nav pull-right" style="display: none;" id="nav-settings">
+            <li class="dropdown">
+              <a data-toggle="dropdown" class="dropdown-toggle" href="#" id="nav-user">Username <b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li><a href="/account/" id="nav-account">Account Settings</a></li>
+                <li><a href="/forum/" id="nav-account">Forum</a></li>
+                <li><a href="/blog-post/" id="nav-blog" style="display: none;">Blog</a></li>
+                <li class="divider"></li>
+                <li><a href="#" id="btn-logout">Logout</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content -->  
+  <div class="container-fluid">
+    <div class="row-fluid">
+      <!-- Sidebar -->
+      <div class="span2">
+        <!-- Menu -->
+        <div class="well sidebar-nav">
+          <ul class="nav nav-list">
+            <li class="nav-header">Menu</li>
+            <li><a href="/"><i class="icon-home"></i> Home</a></li>
+            <li><a href="/forum/"><i class="icon-th-list"></i> Forum</a></li>
+            <li><a href="https://email.cogswell.edu" target="_blank"><i class="icon-envelope"></i> Cogswell Email</a></li>
+            <li><a href="https://ecams.cogswell.edu/student/" target="_blank"><i class="icon-briefcase"></i> Cogswell Portal</a></li>      
+            <li class="nav-header">Sites</li>
+            <li><a href="/directory/"><i class="icon-folder-open"></i> Directory</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Main -->
+      <div class="span10">
+        <div class="hero-unit" style="min-height:250px;">
+          <form class="form-horizontal" action="javascript:void(0);" id="form-account">
+            <div class="control-group">
+              <h2>Account settings:</h2>
+            </div>
+            <div class="control-group">
+              <label class="control-label">First name</label>
+              <div class="controls">
+                <input type="text" id="form-account-fname" name="form-account-fname" placeholder="First name">
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label">Last name</label>
+              <div class="controls">
+                <input type="text" id="form-account-lname" name="form-account-lname" placeholder="Last name">
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label">Program</label>
+              <div class="controls">
+                <select id="form-account-program" name="form-account-program">
+                  <option value="">Please select one</option>
+                  <option value="GDD">Game Design and Development</option>
+                  <option value="DMM">Digital Media Management</option>
+                  <option value="DAA">Digital Art and Animation</option>
+                  <option value="DAT">Digital Audio Technology</option>
+                  <option value="ENT">Entrepreneurship</option>
+                  <option value="ENG">Engineering</option>
+                  <option value="FS">Fire Science</option>
+                </select>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label">Email</label>
+              <div class="controls">
+                <div class="account-text" id="form-account-email" name="form-account-email"></div>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label">Created</label>
+              <div class="controls">
+                <div class="account-text" id="form-account-created" name="form-account-created"></div>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label">Last login</label>
+              <div class="controls">
+                <div class="account-text" id="form-account-updated" name="form-account-updated"></div>
+              </div>
+            </div>
+            <div class="control-group">
+              <div class="controls">
+                <button class="btn btn-large btn-primary" id="btn-account-submit">Submit</button>
+              </div>
+            </div>
+          </form>
+          <!-- Hidden DIV -->
+          <div class="alert alert-error" style="visibility: hidden; min-height:15px;" id="form-account-error">
+            <B>Error!</B> settings not save.
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Footer -->
+    <footer>
+    <hr>
+    <p><a href="/about/">Cogswell Now</a> | 2013</p>
+    </footer>
+  </div>
+</body>
+</html>

@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="us">
+<head>
+  <!-- Title Stuff -->
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="favicon.ico">
+  <title>Cogswell Now - Forum</title>
+  
+  <!-- CSS Includes -->
+  <link href="../css/bootstrap.css" rel="stylesheet">
+
+  <!-- JS Includes -->
+  <script src="../js/jquery-1.9.1.js"></script>
+  <script src="../js/jquery.cookie.js"></script>
+  <script src="../js/bootstrap.js"></script>
+  <script src="../js/cogswell.navbar.js"></script>
+  <script src="../js/cogswell.forum.js"></script>
+
+</head>
+
+<body>
+  <!-- Navbar -->
+  <div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="brand" href="/" style="padding-top: 6px; padding-bottom: 0px;">
+          <img class="" src="../img/logo-gray.png">
+        </a>
+        <div class="nav-collapse collapse">
+          <!-- Home -->
+          <ul class="nav">
+            <li><a href="/">Home</a></li>
+            <li></li>
+          </ul>
+          <!-- Sign in/register -->
+          <form action="javascript:void(0);" class="navbar-form pull-right" id="form-signin">
+            <input class="span2" type="text" placeholder="Email" name="form-signin-email" id="input-signing-email">
+            <input class="span2" type="password" placeholder="Password" name="form-signin-pass" id="input-signin-pass">
+            <button type="submit" class="btn btn-primary" id="btn-signin">Sign in</button>
+            <a href="/register/" type="submit" class="btn" id="btn-register">Register</a>            
+          </form>
+          <!-- Settings drop down-->
+          <ul class="nav pull-right" style="display: none;" id="nav-settings">
+            <li class="dropdown">
+              <a data-toggle="dropdown" class="dropdown-toggle" href="#" id="nav-user">Username <b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li><a href="/account/" id="nav-account">Account Settings</a></li>
+                <li><a href="/forum/" id="nav-account">Forum</a></li>
+                <li><a href="/blog-post/" id="nav-blog" style="display: none;">Blog</a></li>
+                <li class="divider"></li>
+                <li><a href="#" id="btn-logout">Logout</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content -->  
+  <div class="container-fluid" id="forum-top">
+    <div class="row-fluid">
+      <!-- Sidebar -->
+      <div class="span2">
+        <!-- Menu -->
+        <div class="well sidebar-nav">
+          <ul class="nav nav-list">
+            <li class="nav-header">Menu</li>
+            <li><a href="/"><i class="icon-home"></i> Home</a></li>
+            <li><a href="/forum/"><i class="icon-th-list"></i> Forum</a></li>
+            <li><a href="https://email.cogswell.edu" target="_blank"><i class="icon-envelope"></i> Cogswell Email</a></li>
+            <li><a href="https://ecams.cogswell.edu/student/" target="_blank"><i class="icon-briefcase"></i> Cogswell Portal</a></li>      
+            <li class="nav-header">Sites</li>
+            <li><a href="/directory/"><i class="icon-folder-open"></i> Directory</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Main -->
+      <div class="span10">
+        <div class="hero-unit" style="min-height:250px;">
+          <div class="btn-group pull-right">
+          <a class="btn btn-primary" href="#forum-modal-post" role="button" data-toggle="modal"><i class="icon-plus icon-white"></i> post</a>
+          </div>
+          <!-- Forum -->
+            <div id="forum"><center>Loading forum...</center></div>
+            <!-- Forum pagination -->
+            <ul class="pager">
+              <li class="previous" id="forum-prev">
+                <a href="#forum-top">Prev</a>
+              </li>
+              <li class="next" id="forum-next">
+                <a href="#forum-top">Next</a>
+              </li>
+            </ul>
+          <!-- Modal -->
+          <div id="forum-modal-post" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="forum-modal-label" aria-hidden="true">
+            <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="forum-modal-label">Add a forum post</h3>
+            </div>
+            <div class="modal-body">
+              <form class="form-horizontal" action="javascript:void(0);" id="form-forum-post">
+                <label><b>Title</b></label>
+                <input type="text" class="input-xlarge" id="form-forum-title" name="form-forum-title" placeholder="Title">
+                <label><b>Body</b></label>
+                <textarea rows="10" class="input-xlarge" id="form-forum-body" name="form-forum-body" placeholder="Body"></textarea>
+                <label><b>Type</b></label>
+                <select id="form-forum-tag" class="input-xlarge" name="form-forum-type">
+                  <option>Discussion</option>
+                  <option>Academic help</option>
+                  <option>Lost & found</option>
+                  <option>Help wanted</option>
+                  <option>Selling</option>
+                  <option>Event</option>
+                </select>
+              </form>
+              <!-- Hidden DIV -->
+              <div class="alert alert-error" style="visibility: hidden;" id="form-forum-error">
+                <B>Error!</B> please fix the following: 
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-primary" aria-hidden="true" id="btn-forum-submit">Submit</button>
+            </div>
+          </div>
+
+          <div id="forum-modal-comment" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="forum-modal-comment-label" aria-hidden="true">
+            <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="forum-modal-comment-label">Comment: </h3>
+            </div>
+            <div class="modal-body">
+              <form class="form-horizontal" action="javascript:void(0);" id="form-forum-comment">
+                <label><b>Body</b></label>
+                <textarea rows="10" class="input-xlarge" id="form-forum-comment-body" name="form-forum-comment-body" placeholder="Body"></textarea>
+                <input type="hidden" name="form-forum-comment-title" id="form-forum-comment-title" value="">
+                <input type="hidden" name="form-forum-comment-id" id="form-forum-comment-id" value="">
+              </form>
+              <!-- Hidden DIV -->
+              <div class="alert alert-error" style="visibility: hidden;" id="form-forum-comment-error">
+                <B>Error!</B> please fix the following: 
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-primary" aria-hidden="true" id="btn-forum-comment">Submit</button>
+            </div>
+          </div>
+
+          <div id="forum-modal-delete" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="forum-modal-delete-label" aria-hidden="true">
+            <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="forum-modal-delete-label">Post: </h3>
+            </div>
+            <div class="modal-body">
+              Are you sure you want to delete the post?
+              <form class="form-horizontal" action="javascript:void(0);" id="form-forum-delete">
+                <input type="hidden" name="form-forum-delete-title" id="form-forum-delete-title" value="">
+                <input type="hidden" name="form-forum-delete-owner" id="form-forum-delete-owner" value="">
+              </form>
+              <!-- Hidden DIV -->
+              <div class="alert alert-error" style="visibility: hidden;" id="form-forum-delete-error"></div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-primary" aria-hidden="true" id="btn-forum-del">Submit</button>
+            </div>
+          </div>
+
+          <div id="forum-modal-delete-comment" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="forum-modal-delete-comment-label" aria-hidden="true">
+            <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="forum-modal-delete-comment-label">Comment: </h3>
+            </div>
+            <div class="modal-body">
+              Are you sure you want to delete the the comment?
+              <form class="form-horizontal" action="javascript:void(0);" id="form-forum-delete-comment">
+                <input type="hidden" name="form-forum-delete-comment-body" id="form-forum-delete-comment-body" value="">
+                <input type="hidden" name="form-forum-delete-comment-owner" id="form-forum-delete-comment-owner" value="">
+                <input type="hidden" name="form-forum-delete-parent-title" id="form-forum-delete-parent-title" value="">
+                <input type="hidden" name="form-forum-delete-parent-owner" id="form-forum-delete-parent-owner" value="">
+              </form>
+              <!-- Hidden DIV -->
+              <div class="alert alert-error" style="visibility: hidden;" id="form-forum-delete-comment-error"></div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-primary" aria-hidden="true" id="btn-forum-del-comment">Submit</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <!-- Footer -->
+    <footer>
+    <hr>
+    <p><a href="/about/">Cogswell Now</a> | 2013</p>
+    </footer>
+  </div>
+</body>
+</html>

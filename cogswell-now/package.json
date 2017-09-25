@@ -1,0 +1,25 @@
+{
+  "name": "CogswellNow",
+  "version": "0.1.3",
+  "description": "Cogswell Now website",
+  "main": "webservice.js",
+  "dependencies": {
+    "express": "~3.2.5",
+    "mongoose": "~3.6.11"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node webservice.js"
+  },
+  "keywords": [
+    "Cogswell"
+  ],
+  "author": "Jared De La Cruz",
+  "license": "BSD",
+  "readmeFilename": "README.md",
+  "subdomain": "cogswellnow",
+  "engines": {
+    "node": "0.10.x"
+  }
+}

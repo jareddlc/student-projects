@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="us">
+<head>
+  <!-- Title Stuff -->
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="../favicon.ico">
+  <title>Cogswell Now -  Post a blog</title>
+  
+  <!-- CSS Includes -->
+  <link href="../css/bootstrap.css" rel="stylesheet">
+
+  <!-- JS Includes -->
+  <script src="../js/jquery-1.9.1.js"></script>
+  <script src="../js/jquery.cookie.js"></script>
+  <script src="../js/bootstrap.js"></script>
+  <script src="../js/cogswell.navbar.js"></script>
+  <script src="../js/cogswell.blog-post.js"></script>
+
+</head>
+
+<body>
+  <!-- Navbar -->
+  <div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="brand" href="/" style="padding-top: 6px; padding-bottom: 0px;">
+          <img class="" src="../img/logo-gray.png">
+        </a>
+        <div class="nav-collapse collapse">
+          <!-- Home -->
+          <ul class="nav">
+            <li><a href="/">Home</a></li>
+            <li></li>
+          </ul>
+          <!-- Sign in/register -->
+          <form action="javascript:void(0);" class="navbar-form pull-right" id="form-signin">
+            <input class="span2" type="text" placeholder="Email" name="form-signin-email" id="input-signing-email">
+            <input class="span2" type="password" placeholder="Password" name="form-signin-pass" id="input-signin-pass">
+            <button type="submit" class="btn btn-primary" id="btn-signin">Sign in</button>
+            <a href="/register/" type="submit" class="btn" id="btn-register">Register</a>            
+          </form>
+          <!-- Settings drop down-->
+          <ul class="nav pull-right" style="display: none;" id="nav-settings">
+            <li class="dropdown">
+              <a data-toggle="dropdown" class="dropdown-toggle" href="#" id="nav-user">Username <b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li><a href="/account/" id="nav-account">Account Settings</a></li>
+                <li><a href="/forum/" id="nav-account">Forum</a></li>
+                <li><a href="/blog-post/" id="nav-blog" style="display: none;">Blog</a></li>
+                <li class="divider"></li>
+                <li><a href="#" id="btn-logout">Logout</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="container">
+    <!-- Hero unit -->
+    <div class="hero-unit">
+      <form class="form-horizontal" action="javascript:void(0);" id="form-blog-post">
+        <div class="control-group">
+          <div class="controls">
+          <h2>Add a blog post:</h2>
+          </div>
+        </div>
+        <div class="control-group">
+          <div class="controls">
+            <label><b>Title</b></label>
+            <input type="text" class="input-xxlarge" id="form-blog-title" name="form-blog-title" placeholder="Title">
+          </div>
+        </div>
+        <div class="control-group">
+          <div class="controls">
+            <label><b>Body</b></label>
+            <textarea rows="10" class="input-xxlarge" id="form-blog-body" name="form-blog-body" placeholder="Body"></textarea>
+          </div>
+        </div>
+        <div class="control-group">
+          <div class="controls">
+            <label><b>Type</b></label>
+            <select id="form-blog-tag" name="form-blog-type">
+              <option>ASB Notice</option>
+              <option>Club Notice</option>
+              <option>Event</option>
+            </select>
+          </div>
+        </div>
+        <div class="control-group">
+          <div class="controls">
+            <label><b>Tag</b></label>
+            <label class="checkbox">
+              <input type="checkbox" class="form-blog-checkbox" id="" value="GDD"> Game Design and Development
+            </label>
+            <label class="checkbox">
+              <input type="checkbox" class="form-blog-checkbox" id="" value="DMM"> Digital Media Management
+            </label>
+            <label class="checkbox">
+              <input type="checkbox" class="form-blog-checkbox" id="" value="DAA"> Digital Art and Animation
+            </label>
+            <label class="checkbox">
+              <input type="checkbox" class="form-blog-checkbox"  id="" value="DAT"> Digital Audio Technology
+            </label>
+            <label class="checkbox">
+              <input type="checkbox" class="form-blog-checkbox"  id="" value="ENT"> Entrepreneurship
+            </label>
+            <label class="checkbox">
+              <input type="checkbox" class="form-blog-checkbox"  id="" value="ENG"> Engineering
+            </label>
+            <label class="checkbox">
+              <input type="checkbox" class="form-blog-checkbox"  id="" value="FS"> Fire Science
+            </label>
+          </div>
+        </div>
+        <div class="control-group">
+          <div class="controls">
+            <button class="btn btn-large btn-primary" id="btn-blog-submit">Submit</button>
+          </div>
+        </div>
+      </form>
+      <!-- Hidden DIV -->
+      <div class="alert alert-error" style="visibility: hidden; min-height:15px;" id="form-blog-post-error">
+        <B>Error!</B> Please fix the following:<div id="alert-error"></div>
+      </div>
+      </div>
+      <!-- Footer -->
+      <footer>
+      <hr>
+      <p><a href="/about/">Cogswell Now</a> | 2013</p>
+      </footer>
+  </div>  
+</body>
+</html>

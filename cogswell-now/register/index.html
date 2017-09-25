@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="us">
+<head>
+  <!-- Title Stuff -->
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="../favicon.ico">
+  <title>Cogswell Now -  Register</title>
+  
+  <!-- CSS Includes -->
+  <link href="../css/bootstrap.css" rel="stylesheet">
+
+  <!-- JS Includes -->
+  <script src="../js/jquery-1.9.1.js"></script>
+  <script src="../js/bootstrap.js"></script>
+  <script src="../js/cogswell.register.js"></script>
+
+  <!-- CSS -->
+  <style>
+  body
+  {
+    padding-top: 40px;
+    padding-bottom: 40px;
+    background-color: #f5f5f5;
+  }
+
+  .form-signin
+  {
+    max-width: 300px;
+    padding: 19px 29px 29px;
+    margin: 0 auto 20px;
+    background-color: #fff;
+    border: 1px solid #e5e5e5;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+    -moz-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+    box-shadow: 0 1px 2px rgba(0,0,0,.05);
+  }
+  .form-signin .form-signin-heading,
+  .form-signin .checkbox
+  {
+    margin-bottom: 10px;
+  }
+  .form-signin input[type="text"],
+  .form-signin input[type="password"]
+  {
+    font-size: 16px;
+    height: auto;
+    margin-bottom: 15px;
+    padding: 7px 9px;
+  }
+  </style>
+</head>
+
+<body>
+  <!-- Main -->
+  <div class="container">
+    <form action="javascript:void(0);" class="form-signin" id="form-register">
+      <h2 class="form-signin-heading">Register</h2>
+      <div class="control-group">
+        <label class="control-label" for="form-register-fname">First name</label>
+        <div class="controls">
+          <input type="text" class="input-block-level" placeholder="First name" name="form-register-fname">
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="form-register-lname">Last name</label>
+        <div class="controls">
+          <input type="text" class="input-block-level" placeholder="Last name" name="form-register-lname">
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="form-register-email">Cogswell email address</label>
+        <div class="controls">
+          <input type="text" class="input-block-level" placeholder="Cogswell email address" name="form-register-email">
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="form-register-pass">Password</label>
+        <div class="controls">
+          <input type="password" class="input-block-level" placeholder="Password" name="form-register-pass">
+        </div>
+      </div>      
+      <button class="btn btn-large btn-primary" type="submit" id="btn-register">Submit</button>
+    </form>
+    <!-- Hidden DIV -->
+    <div class="alert alert-error" style="visibility: hidden; min-height:15px;" id="form-register-error">
+      <B>Error!</B> Please fix the following:<div id="alert-error"></div>
+    </div>
+  </div>  
+</body>
+</html>
