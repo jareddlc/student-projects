@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual C++ Express 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "c++_gui_subgame", "c++_gui_subgame\c++_gui_subgame.vcxproj", "{9267B33E-3B04-42FE-94B6-39DB41E2BAEB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9267B33E-3B04-42FE-94B6-39DB41E2BAEB}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9267B33E-3B04-42FE-94B6-39DB41E2BAEB}.Debug|Win32.Build.0 = Debug|Win32
+		{9267B33E-3B04-42FE-94B6-39DB41E2BAEB}.Release|Win32.ActiveCfg = Release|Win32
+		{9267B33E-3B04-42FE-94B6-39DB41E2BAEB}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
