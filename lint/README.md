@@ -1,5 +1,5 @@
 # lint
-My first node.js project. This application has some extends basic CRUD operations on a MySQL databse. It was planned to turn into a simple CMS but was never completed.
+My first node.js project. This application extends basic CRUD operations on a MySQL database. It allows the user to interact with the MySQL database via the web UI to create new databases, tables, columns, and rows.
 
 ### Dependencies
 
