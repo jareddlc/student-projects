@@ -1,0 +1,6 @@
+cogswell-now/css/* linguist-vendored
+cogswell-now/js/bootstrap* linguist-vendored
+cogswell-now/js/jquery* linguist-vendored
+
+lint/css/* linguist-vendored
+lint/js/* linguist-vendored
