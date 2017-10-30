@@ -9,5 +9,3 @@ Unity is the ultimate game development platform. Use Unity to build high-quality
 ### Running
 
 Launch the game
-
-2ab83ca078F
